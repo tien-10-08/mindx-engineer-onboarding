@@ -1,56 +1,40 @@
 // src/App.tsx
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from './lib/axios'; // import axios instance
 
-function Home() {
-  const [message, setMessage] = useState<string>('Loading...');
-  const [error, setError] = useState<string>('');
+function App() {
+  const [status, setStatus] = useState<string>('Đang kiểm tra kết nối...');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    axios.get('/api/')    
-      .then(res => {
-        setMessage(res.data.message || 'Hello from API!');
-      })
-      .catch(err => {
-        setError('API Error: ' + (err.message || 'Unknown error'));
-      });
+    const checkApi = async () => {
+      try {
+        // Giả sử backend của bạn có endpoint /health hoặc / (root)
+        const response = await api.get('/health'); // thay bằng endpoint thật của bạn
+        // Ví dụ: nếu backend trả { message: "OK" }
+        setStatus(response.data.message || 'API đang hoạt động!');
+      } catch (err: any) {
+        console.error('API error:', err);
+        setError(err.message || 'Không kết nối được với backend');
+        setStatus('Lỗi kết nối');
+      }
+    };
+
+    checkApi();
   }, []);
 
   return (
-    <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial' }}>
-      <h1>React Frontend - Week 1 Onboarding</h1>
-      <p>Backend API Response: {message}</p>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <nav>
-        <Link to="/about" style={{ margin: '0 15px', textDecoration: 'none', color: 'blue' }}>
-          Go to About Page
-        </Link>
-      </nav>
+    <div style={{ padding: '2rem', fontFamily: 'system-ui' }}>
+      <h1>MindX Fullstack - Frontend</h1>
+      
+      <div style={{ marginTop: '2rem' }}>
+        <h3>Trạng thái kết nối Backend:</h3>
+        <p style={{ color: error ? 'red' : 'green', fontWeight: 'bold' }}>
+          {status}
+        </p>
+        {error && <p style={{ color: 'red' }}>Lỗi: {error}</p>}
+      </div>
     </div>
-  );
-}
-
-function About() {
-  return (
-    <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial' }}>
-      <h1>About Page</h1>
-      <p>Đây là ứng dụng full-stack React + Express được deploy trên AKS.</p>
-      <Link to="/" style={{ color: 'blue', textDecoration: 'none' }}>
-        Back to Home
-      </Link>
-    </div>
-  );
-}
-
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-      </Routes>
-    </Router>
   );
 }
 
