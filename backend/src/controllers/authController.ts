@@ -1,0 +1,104 @@
+import bcrypt from "bcryptjs";
+import User from "../models/User.js";
+import jwt from "jsonwebtoken";
+import cypto from "crypto";
+import sessionSchema from "../models/Session.js";
+
+const accessTokenExpiry = "30m"; // Thời gian hết hạn của access token
+const refreshTokenExpiry = 14 * 24 * 60 * 60 * 1000; // Thời gian hết hạn của refresh token
+
+export const signup = async (req, res) => {
+  try {
+    const { username, password, email, firstName, lastName } = req.body;
+    if (!username || !password || !email || !firstName || !lastName) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+    const duplicate = await User.findOne({ $or: [{ username }, { email }] });
+    if (duplicate) {
+      return res
+        .status(409)
+        .json({ message: "Username or email already exists" });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({
+      username,
+      hashedPassword,
+      email,
+      displayName: `${firstName} ${lastName}`,
+    });
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error("Signup error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const login = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({
+        message: "Username and password are required",
+      });
+    }
+
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "Username or password is incorrect" });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
+    if (!passwordMatch) {
+      return res
+        .status(401)
+        .json({ message: "Username or password is incorrect" });
+    }
+
+    const accessToken = jwt.sign(
+      { userId: user._id, username: user.username },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: accessTokenExpiry }
+    );
+
+    const refreshToken = cypto.randomBytes(64).toString("hex");
+
+    await Session.create({
+      userId: user._id,
+      refreshToken,
+      expiresAt: new Date(Date.now() + refreshTokenExpiry),
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: refreshTokenExpiry,
+    });
+
+    return res.status(200).json({ message: "Login successful", accessToken });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    //lấy refresh token từ cookie
+    const token = req.cookies.refreshToken;
+    if (token) {
+      // xóa refresh token khỏi Session
+      await Session.deleteOne({ refreshToken: token });
+      //xóa cookie
+      res.clearCookie("refreshToken");
+    }
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
