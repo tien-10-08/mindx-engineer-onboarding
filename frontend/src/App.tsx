@@ -1,40 +1,39 @@
 // src/App.tsx
-import { useState, useEffect } from 'react';
-import api from './lib/axios'; // import axios instance
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/SignUpPage';
+import HomePage from './pages/HomePage';
+import MessengePage from './pages/MessengePage';
 
 function App() {
-  const [status, setStatus] = useState<string>('Đang kiểm tra kết nối...');
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const checkApi = async () => {
-      try {
-        // Giả sử backend của bạn có endpoint /health hoặc / (root)
-        const response = await api.get('/health'); // thay bằng endpoint thật của bạn
-        // Ví dụ: nếu backend trả { message: "OK" }
-        setStatus(response.data.message || 'API đang hoạt động!');
-      } catch (err: any) {
-        console.error('API error:', err);
-        setError(err.message || 'Không kết nối được với backend');
-        setStatus('Lỗi kết nối');
-      }
-    };
-
-    checkApi();
-  }, []);
-
   return (
-    <div style={{ padding: '2rem', fontFamily: 'system-ui' }}>
-      <h1>MindX Fullstack - Frontend</h1>
-      
-      <div style={{ marginTop: '2rem' }}>
-        <h3>Trạng thái kết nối Backend:</h3>
-        <p style={{ color: error ? 'red' : 'green', fontWeight: 'bold' }}>
-          {status}
-        </p>
-        {error && <p style={{ color: 'red' }}>Lỗi: {error}</p>}
-      </div>
-    </div>
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <MessengePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 
