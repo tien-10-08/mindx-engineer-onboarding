@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: week1-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: week1-frontend
+  template:
+    metadata:
+      labels:
+        app: week1-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: mindxtien2026.azurecr.io/week1-frontend:latest
+          ports:
+            - containerPort: 80
