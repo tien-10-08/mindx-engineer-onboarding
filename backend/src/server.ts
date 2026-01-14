@@ -1,3 +1,4 @@
+/// <reference path="./express.d.ts" />
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./libs/db";
@@ -9,7 +10,7 @@ import { protectedRouter } from "./middlewares/authMiddleware";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cookieParser());

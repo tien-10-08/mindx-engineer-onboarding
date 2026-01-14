@@ -1,4 +1,6 @@
-export const authMe = async (req, res) => {
+import { Request, Response } from "express";
+
+export const authMe = async (req: Request, res: Response) => {
   try {
     const user = req.user;
     return res.status(200).json({ user });

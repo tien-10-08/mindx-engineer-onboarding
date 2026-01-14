@@ -1,13 +1,14 @@
+import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import User from "../models/User.js";
+import User from "../models/User";
 import jwt from "jsonwebtoken";
-import cypto from "crypto";
-import sessionSchema from "../models/Session.js";
+import crypto from "crypto";
+import Session from "../models/Session";
 
 const accessTokenExpiry = "30m"; // Thời gian hết hạn của access token
 const refreshTokenExpiry = 14 * 24 * 60 * 60 * 1000; // Thời gian hết hạn của refresh token
 
-export const signup = async (req, res) => {
+export const signup = async (req: Request, res: Response) => {
   try {
     const { username, password, email, firstName, lastName } = req.body;
     if (!username || !password || !email || !firstName || !lastName) {
@@ -35,7 +36,7 @@ export const signup = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -58,13 +59,17 @@ export const login = async (req, res) => {
         .json({ message: "Username or password is incorrect" });
     }
 
+    const secret = process.env.ACCESS_TOKEN_SECRET;
+    if (!secret) {
+      return res.status(500).json({ message: "Server configuration error" });
+    }
     const accessToken = jwt.sign(
       { userId: user._id, username: user.username },
-      process.env.ACCESS_TOKEN_SECRET,
+      secret,
       { expiresIn: accessTokenExpiry }
     );
 
-    const refreshToken = cypto.randomBytes(64).toString("hex");
+    const refreshToken = crypto.randomBytes(64).toString("hex");
 
     await Session.create({
       userId: user._id,
@@ -86,7 +91,7 @@ export const login = async (req, res) => {
   }
 };
 
-export const logout = async (req, res) => {
+export const logout = async (req: Request, res: Response) => {
   try {
     //lấy refresh token từ cookie
     const token = req.cookies.refreshToken;
