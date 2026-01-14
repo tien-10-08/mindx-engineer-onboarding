@@ -30,10 +30,9 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use("/api/auth", authRoute);
-
+app.use("/auth", authRoute);
 app.use(protectedRouter);
-app.use("/api/user", userRoute);
+app.use("/user", userRoute);
 
 const startServer = async () => {
   try {

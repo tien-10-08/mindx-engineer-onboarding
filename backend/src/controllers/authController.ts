@@ -91,6 +91,55 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+export const refresh = async (req: Request, res: Response) => {
+  try {
+    // Lấy refresh token từ cookie
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ message: "Refresh token not provided" });
+    }
+
+    // Tìm session với refresh token
+    const session = await Session.findOne({ refreshToken });
+    if (!session) {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+
+    // Kiểm tra session đã hết hạn chưa
+    if (session.expiresAt < new Date()) {
+      await Session.deleteOne({ refreshToken });
+      return res.status(403).json({ message: "Refresh token expired" });
+    }
+
+    // Tìm user từ session
+    const user = await User.findById(session.userId);
+    if (!user) {
+      await Session.deleteOne({ refreshToken });
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Tạo access token mới
+    const secret = process.env.ACCESS_TOKEN_SECRET;
+    if (!secret) {
+      return res.status(500).json({ message: "Server configuration error" });
+    }
+
+    const accessToken = jwt.sign(
+      { userId: user._id, username: user.username },
+      secret,
+      { expiresIn: accessTokenExpiry }
+    );
+
+    return res.status(200).json({
+      message: "Token refreshed successfully",
+      accessToken,
+    });
+  } catch (error) {
+    console.error("Refresh token error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const logout = async (req: Request, res: Response) => {
   try {
     //lấy refresh token từ cookie
