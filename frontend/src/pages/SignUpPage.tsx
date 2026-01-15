@@ -140,7 +140,7 @@ export default function SignupPage() {
                   }
                   placeholder="User name..."
                   onFocus={() => setFocusedField("fullName")}
-                  onBlur={(e) => {
+                  onBlur={() => {
                     field.onBlur();
                     setFocusedField(null);
                   }}
@@ -186,7 +186,7 @@ export default function SignupPage() {
                   }
                   placeholder="Email..."
                   onFocus={() => setFocusedField("email")}
-                  onBlur={(e) => {
+                  onBlur={() => {
                     field.onBlur();
                     setFocusedField(null);
                   }}
@@ -231,7 +231,7 @@ export default function SignupPage() {
                   }
                   placeholder="Username..."
                   onFocus={() => setFocusedField("username")}
-                  onBlur={(e) => {
+                  onBlur={() => {
                     field.onBlur();
                     setFocusedField(null);
                   }}
@@ -276,7 +276,7 @@ export default function SignupPage() {
                   }
                   placeholder="Password..."
                   onFocus={() => setFocusedField("password")}
-                  onBlur={(e) => {
+                  onBlur={() => {
                     field.onBlur();
                     setFocusedField(null);
                   }}
@@ -324,7 +324,7 @@ export default function SignupPage() {
                   }
                   placeholder="Confirm Password..."
                   onFocus={() => setFocusedField("confirmPassword")}
-                  onBlur={(e) => {
+                  onBlur={() => {
                     field.onBlur();
                     setFocusedField(null);
                   }}

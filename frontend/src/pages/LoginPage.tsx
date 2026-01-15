@@ -112,7 +112,7 @@ export default function LoginPage() {
                     />
                   }
                   onFocus={() => setFocusedField("username")}
-                  onBlur={(e) => {
+                  onBlur={() => {
                     field.onBlur();
                     setFocusedField(null);
                   }}
@@ -157,7 +157,7 @@ export default function LoginPage() {
                     />
                   }
                   onFocus={() => setFocusedField("password")}
-                  onBlur={(e) => {
+                  onBlur={() => {
                     field.onBlur();
                     setFocusedField(null);
                   }}

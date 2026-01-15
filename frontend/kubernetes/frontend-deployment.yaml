@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: mindxtien2026.azurecr.io/week1-frontend:latest
+          image: mindxtien2026.azurecr.io/week1-frontend:fix-01
           ports:
             - containerPort: 80

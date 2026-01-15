@@ -1,6 +1,6 @@
 import { Lock } from "lucide-react";
 import { Divider } from "antd";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type AuthLayoutProps = {
   children: ReactNode;
