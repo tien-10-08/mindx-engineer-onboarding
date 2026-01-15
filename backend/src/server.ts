@@ -6,11 +6,22 @@ import authRoute from "./routes/authRoute";
 import userRoute from "./routes/userRoute";
 import cookieParser from "cookie-parser";
 import { protectedRouter } from "./middlewares/authMiddleware";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200,
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());

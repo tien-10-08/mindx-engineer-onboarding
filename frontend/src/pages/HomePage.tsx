@@ -52,10 +52,7 @@ export default function HomePage() {
               <p className="text-sm text-gray-500">Email</p>
               <p className="text-gray-800 font-medium">{user?.email}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">User ID</p>
-              <p className="text-gray-800 font-mono text-sm">{user?._id}</p>
-            </div>
+            
           </div>
         </Card>
       </div>

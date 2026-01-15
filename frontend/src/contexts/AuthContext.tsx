@@ -1,5 +1,6 @@
 // Authentication Context
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import type { AuthContextType, User, LoginCredentials, SignupCredentials } from '../types/auth';
 import { authService } from '../services/authService';
 import { tokenStorage } from '../utils/tokenStorage';
