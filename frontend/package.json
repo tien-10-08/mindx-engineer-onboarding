@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && docker build -t mindxtien2026.azurecr.io/week1-frontend:latest . && az acr login --name mindxtien2026 && docker push mindxtien2026.azurecr.io/week1-frontend:latest && kubectl set image deployment/week1-frontend frontend=mindxtien2026.azurecr.io/week1-frontend:latest && kubectl rollout status deployment/week1-frontend"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

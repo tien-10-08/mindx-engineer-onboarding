@@ -7,7 +7,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "deploy": "npm run build && docker build -t mindxtien2026.azurecr.io/week1-api:latest . && az acr login --name mindxtien2026 && docker push mindxtien2026.azurecr.io/week1-api:latest && kubectl set image deployment/week1-api week1-api-container=mindxtien2026.azurecr.io/week1-api:latest && kubectl rollout status deployment/week1-api"
   },
   "keywords": [],
   "author": "",

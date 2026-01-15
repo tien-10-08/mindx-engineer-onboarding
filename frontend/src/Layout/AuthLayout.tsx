@@ -1,5 +1,4 @@
 import { Lock } from "lucide-react";
-import { Divider } from "antd";
 import type { ReactNode } from "react";
 
 type AuthLayoutProps = {
@@ -11,7 +10,6 @@ type AuthLayoutProps = {
     linkText: string;
     onClick: () => void;
   };
-  socialButtons?: ReactNode;
 };
 
 export default function AuthLayout({
@@ -19,7 +17,6 @@ export default function AuthLayout({
   icon = <Lock size={28} strokeWidth={2.5} />,
   title,
   footerLink,
-  socialButtons,
 }: AuthLayoutProps) {
   return (
     <div className="min-h-screen w-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center p-4 relative overflow-hidden">
@@ -47,17 +44,6 @@ export default function AuthLayout({
           </div>
 
           {children}
-
-          {socialButtons && (
-            <>
-              <Divider plain className="my-6">
-                <span className="text-xs font-medium text-gray-400 uppercase tracking-wider px-2">
-                  Or continue with
-                </span>
-              </Divider>
-              {socialButtons}
-            </>
-          )}
 
           {footerLink && (
             <div className="text-center pt-6 mt-6 border-t border-gray-100">

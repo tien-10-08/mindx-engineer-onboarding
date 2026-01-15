@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Input, Button, Checkbox, message } from "antd";
-import { User, Lock, Eye, EyeOff, Chrome, Facebook } from "lucide-react";
+import { User, Lock, Eye, EyeOff } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import AuthLayout from "../Layout/AuthLayout";
 import { z } from "zod";
@@ -51,28 +51,10 @@ export default function LoginPage() {
     }
   };
 
-  const socialButtons = (
-    <div className="grid grid-cols-2 gap-4">
-      <Button
-        icon={<Chrome size={20} />}
-        className="flex items-center justify-center h-12 rounded-2xl border-2 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-300 hover:scale-[1.02] font-medium"
-      >
-        <span className="ml-2">Google</span>
-      </Button>
-      <Button
-        icon={<Facebook size={20} />}
-        className="flex items-center justify-center h-12 rounded-2xl border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 hover:scale-[1.02] font-medium"
-      >
-        <span className="ml-2">Facebook</span>
-      </Button>
-    </div>
-  );
-
   return (
     <AuthLayout
       icon={<Lock size={28} strokeWidth={2.5} />}
       title="Welcome!"
-      socialButtons={socialButtons}
       footerLink={{
         text: "Don't have an account?",
         linkText: "Sign up now",
