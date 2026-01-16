@@ -1,73 +1,194 @@
-# React + TypeScript + Vite
+# Frontend - React Authentication Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite frontend application with JWT authentication, deployed on Azure Kubernetes Service (AKS).
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📋 Project Overview
 
-## React Compiler
+React frontend application for the MindX Engineer Onboarding project. Provides user interface for authentication (login/signup) and protected pages, communicating with the backend API.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Tech Stack
 
-## Expanding the ESLint configuration
+- **Framework**: React 19
+- **Build Tool**: Vite
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + Ant Design
+- **Form Management**: React Hook Form
+- **Form Validation**: Zod
+- **HTTP Client**: Axios with interceptors
+- **State Management**: React Context API
+- **Routing**: React Router v6
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Setup
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js 20+
+- npm 
+
+### Installation
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Create `.env` file in `frontend/` directory with required environment variables:**
+   - `VITE_API_BASE_URL` - Backend API base URL
+
+3. **Run development server:**
+   ```bash
+   npm run dev
+   ```
+   The application will run on `http://localhost:5173`
+
+4. **Build for production:**
+   ```bash
+   npm run build
+   ```
+
+---
+
+## 🔐 Authentication Flow
+
+### Overview
+
+The frontend implements JWT-based authentication with automatic token refresh:
+
+1. **User Login/Signup**
+   - User submits credentials via form
+   - Frontend calls backend API
+   - Backend returns access token
+   - Frontend stores access token in localStorage
+   - Refresh token is stored in HTTP-only cookie by backend
+
+2. **Protected Routes**
+   - `ProtectedRoute` component checks authentication status
+   - If not authenticated, redirects to login page
+   - If authenticated, renders the protected page
+
+3. **Token Refresh**
+   - Axios interceptor detects 401 (Unauthorized) errors
+   - Automatically calls `/auth/refresh` endpoint
+   - Backend validates refresh token from cookie
+   - Backend returns new access token
+   - Failed request is retried with new token
+
+4. **User Logout**
+   - Frontend calls `/auth/signout` endpoint
+   - Backend clears refresh token cookie
+   - Frontend removes access token from localStorage
+   - User is redirected to login page
+
+### Routes
+
+- `/login` - Login page (public)
+- `/signup` - Signup page (public)
+- `/` - Home page (protected, requires authentication)
+
+---
+
+## 🚢 Deployment
+
+### Automated Deployment
+
+Use the deployment script:
+```bash
+npm run deploy
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Or from root directory:
+```bash
+npm run deploy:frontend
 ```
+
+This script:
+1. Builds the React application
+2. Builds Docker image
+3. Pushes to Azure Container Registry (ACR)
+4. Updates Kubernetes deployment
+5. Waits for rollout
+
+**Note:** Environment variables must be set at build time for Vite applications.
+
+### Manual Deployment
+
+#### Build and Push to ACR
+
+1. **Set environment variable** (at build time)
+
+2. **Build Docker image:**
+   ```bash
+   docker build -t mindxtien2026.azurecr.io/week1-frontend:latest .
+   ```
+
+3. **Push to ACR:**
+   ```bash
+   az acr login --name mindxtien2026
+   docker push mindxtien2026.azurecr.io/week1-frontend:latest
+   ```
+
+#### Deploy to AKS
+
+```bash
+kubectl apply -f kubernetes/frontend-deployment.yaml
+kubectl apply -f kubernetes/frontend-service.yaml
+```
+
+#### Update Deployment
+
+```bash
+kubectl set image deployment/week1-frontend \
+  frontend=mindxtien2026.azurecr.io/week1-frontend:latest
+kubectl rollout status deployment/week1-frontend
+```
+
+### Verify Deployment
+
+```bash
+kubectl get pods -l app=week1-frontend
+kubectl get svc week1-frontend-service
+```
+
+---
+
+## 📁 Project Structure
+
+```
+frontend/
+├── src/
+│   ├── pages/          # React pages (Login, Signup, Home)
+│   ├── components/     # Reusable components (ProtectedRoute)
+│   ├── contexts/       # AuthContext for state management
+│   ├── services/       # API service functions
+│   ├── utils/          # Utilities (token storage, validation)
+│   └── lib/            # Axios instance with interceptors
+├── kubernetes/         # K8s deployment configs
+├── Dockerfile          # Multi-stage Docker build
+└── package.json
+```
+
+---
+
+## 🧪 Development
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm run deploy` - Deploy to AKS
+
+---
+
+## 📚 Additional Resources
+
+- **[Backend README](../backend/README.md)** - Backend API documentation
+- **[Root README](../README.md)** - Project overview
+
+
+MindX Engineer Onboarding - Week 1
