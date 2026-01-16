@@ -64,7 +64,8 @@ docker run -p 3000:3000 week1-api:latest
 
 - **ACR:** mindxtien2026.azurecr.io
 - **Resource Group:** mindx-intern-06-rg
-- **Web App:** https://<your-app-name>.azurewebsites.net
+- **Web App:** https://victor-filed-freebsd-performance.trycloudflare.com
+
 
 ### Steps
 
