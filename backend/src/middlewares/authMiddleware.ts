@@ -11,7 +11,7 @@ export const protectedRouter = async (
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Invalid authorization header" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     const token = authHeader.split(" ")[1];
@@ -27,7 +27,7 @@ export const protectedRouter = async (
 
     const user = await User.findById(decoded.userId).select("-hashedPassword");
     if (!user) {
-      return res.status(401).json({ message: "User not found" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     req.user = user;
