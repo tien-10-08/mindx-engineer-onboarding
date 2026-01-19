@@ -2,6 +2,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./libs/db";
+import { initializeAppInsights } from "./libs/appInsights";
 import authRoute from "./routes/authRoute";
 import userRoute from "./routes/userRoute";
 import cookieParser from "cookie-parser";
@@ -71,6 +72,7 @@ app.use("/user", userRoute);
 
 const startServer = async () => {
   try {
+    initializeAppInsights();
     await connectDB();
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
