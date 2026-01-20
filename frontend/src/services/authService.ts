@@ -1,5 +1,5 @@
-// API service functions for authentication
 import api from '../lib/axios';
+import { trackAuthEvent, trackError } from './analytics';
 import type {
   LoginCredentials,
   SignupCredentials,
@@ -8,26 +8,51 @@ import type {
 } from '../types/auth';
 
 export const authService = {
-  /**
-   * Login user
-   */
+ 
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/login', credentials);
-    return response.data;
+    try {
+      const response = await api.post<AuthResponse>('/auth/login', credentials);
+      trackAuthEvent('login');
+      return response.data;
+    } catch (error) {
+      trackAuthEvent('failed');
+      trackError(
+        error instanceof Error ? error.message : 'Login failed',
+        'authService.login'
+      );
+      throw error;
+    }
   },
 
-  /**
-   * Register new user
-   */
+  
   signup: async (credentials: SignupCredentials): Promise<void> => {
-    await api.post('/auth/signup', credentials);
+    try {
+      await api.post('/auth/signup', credentials);
+      trackAuthEvent('signup');
+    } catch (error) {
+      trackError(
+        error instanceof Error ? error.message : 'Signup failed',
+        'authService.signup'
+      );
+      throw error;
+    }
   },
 
   /**
    * Logout user
+   * Tracks logout events for user behavior analysis
    */
   logout: async (): Promise<void> => {
-    await api.post('/auth/signout');
+    try {
+      await api.post('/auth/signout');
+      trackAuthEvent('logout');
+    } catch (error) {
+      trackAuthEvent('logout');
+      trackError(
+        error instanceof Error ? error.message : 'Logout failed',
+        'authService.logout'
+      );
+    }
   },
 
   /**

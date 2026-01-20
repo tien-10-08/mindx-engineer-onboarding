@@ -12,8 +12,6 @@ import { errorHandler } from "./middlewares/error";
 
 
 dotenv.config();
-initializeAppInsights();
-
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -45,13 +43,19 @@ app.use(errorHandler);
 
 const startServer = async () => {
   try {
+    initializeAppInsights();
     
     await connectDB();
+    
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);
+    const { trackException } = await import("./libs/appInsights");
+    trackException(error instanceof Error ? error : new Error(String(error)), {
+      context: "server.startup",
+    });
     throw error;
   }
 };

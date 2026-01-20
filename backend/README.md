@@ -33,10 +33,20 @@ Simple Express API with TypeScript deployed on Azure Cloud as part of the MindX 
 
 Create a `.env` file in the `backend/` directory with the following required environment variables:
 
-- `PORT` - Server port
+### Required Variables
+
+- `PORT` - Server port (default: 3000)
 - `MONGODB_URI` - MongoDB connection string
 - `ACCESS_TOKEN_SECRET` - Secret key for JWT token signing
 - `FRONTEND_URL` - Frontend URL for CORS configuration
+
+### Optional Variables
+
+- `APPLICATIONINSIGHTS_CONNECTION_STRING` - Azure Application Insights connection string (for monitoring and observability)
+
+**Note:** If `APPLICATIONINSIGHTS_CONNECTION_STRING` is not set, Application Insights will be disabled (graceful degradation).
+
+See [Azure Application Insights Setup Guide](../../docs/plans/week-2/azure-app-insights-setup.md) for detailed setup instructions.
 
 ## Local Development
 
@@ -157,8 +167,11 @@ kubectl apply -f kubernetes/service.yaml
 kubectl create secret generic week1-api-secrets \
   --from-literal=MONGODB_URI='<your-mongodb-uri>' \
   --from-literal=ACCESS_TOKEN_SECRET='<your-access-token-secret>' \
-  --from-literal=FRONTEND_URL='<your-frontend-url>'
+  --from-literal=FRONTEND_URL='<your-frontend-url>' \
+  --from-literal=APPLICATIONINSIGHTS_CONNECTION_STRING='<your-app-insights-connection-string>'
 ```
+
+**Note:** `APPLICATIONINSIGHTS_CONNECTION_STRING` is optional. If not provided, Application Insights will be disabled (graceful degradation).
 
 #### Update Deployment
 

@@ -3,6 +3,7 @@ import axios, { AxiosError } from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
 import { tokenStorage } from '../utils/tokenStorage';
 import { authService } from '../services/authService';
+import { trackError } from '../services/analytics';
 
 const getBaseURL = () => {
   if (import.meta.env.VITE_API_BASE_URL) {
@@ -95,11 +96,29 @@ api.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError as AxiosError, null);
         tokenStorage.remove();
+        trackError(
+          refreshError instanceof Error
+            ? refreshError.message
+            : 'Token refresh failed',
+          'axios.interceptor.refreshToken'
+        );
         // Redirect to login will be handled by ProtectedRoute
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }
+    }
+
+    if (error.response?.status && error.response.status >= 500) {
+      trackError(
+        `API Error ${error.response.status}: ${error.message}`,
+        `axios.interceptor.${originalRequest?.method || 'unknown'}.${originalRequest?.url || 'unknown'}`
+      );
+    } else if (!error.response) {
+      trackError(
+        `Network Error: ${error.message}`,
+        'axios.interceptor.network'
+      );
     }
 
     return Promise.reject(error);
