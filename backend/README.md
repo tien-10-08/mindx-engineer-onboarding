@@ -46,7 +46,7 @@ Create a `.env` file in the `backend/` directory with the following required env
 
 **Note:** If `APPLICATIONINSIGHTS_CONNECTION_STRING` is not set, Application Insights will be disabled (graceful degradation).
 
-See [Azure Application Insights Setup Guide](../../docs/plans/week-2/azure-app-insights-setup.md) for detailed setup instructions.
+See [Monitoring & Observability](#-monitoring--observability-week-2) section below for detailed setup instructions.
 
 ## Local Development
 
@@ -274,6 +274,23 @@ If `APPLICATIONINSIGHTS_CONNECTION_STRING` is not set, Application Insights is d
 ```bash
 kubectl logs -l app=week1-api | grep "Application Insights"
 ```
+
+#### Azure Alerts
+
+Azure Application Insights alerts are configured to monitor critical metrics and notify via email.
+
+**Alert Rules:**
+- **Exception Rate Critical**: Triggers when exception rate exceeds 5% of requests in 5 minutes
+- **Failed Requests Alert**: Triggers when failed requests (status code >= 400) are detected
+- **Server Unavailable Alert**: Triggers when server health check fails
+- **High Response Time Warning**: Triggers when average response time exceeds threshold
+- **Elevated Exceptions Warning**: Triggers when exception count is elevated
+
+**Access Alerts:**
+- Azure Portal → Application Insights → Alerts → Alert History
+- Email notifications sent to configured Action Group
+
+**Note:** Alerts use log-based queries (Kusto) for reliable detection of failed requests and exceptions.
 
 ---
 

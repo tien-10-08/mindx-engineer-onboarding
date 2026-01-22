@@ -37,7 +37,8 @@ React frontend application for the MindX Engineer Onboarding project. Provides u
    ```
 
 2. **Create `.env` file in `frontend/` directory with required environment variables:**
-   - `VITE_API_BASE_URL` - Backend API base URL
+   - `VITE_API_BASE_URL` - Backend API base URL 
+   - `VITE_GA_MEASUREMENT_ID` - Google Analytics 4 Measurement ID
 
 3. **Run development server:**
    ```bash
