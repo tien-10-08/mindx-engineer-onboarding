@@ -11,6 +11,7 @@ This project is a complete authentication system built as part of the MindX Engi
 - **Backend**: Node.js, Express, TypeScript, MongoDB, JWT
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, Ant Design
 - **DevOps**: Docker, Kubernetes (AKS), Azure Container Registry (ACR)
+- **Monitoring**: Azure Application Insights (Production Metrics), Google Analytics 4 (Product Metrics)
 
 ### Live Demo
 
@@ -99,10 +100,40 @@ mindx-engineer-onboarding/
 
 ---
 
+## 📊 Monitoring & Metrics (Week 2)
+
+### Production Metrics - Azure Application Insights
+
+- **Backend Integration**: HTTP request tracking, custom events (authentication, errors), performance metrics
+- **Live Metrics**: Real-time monitoring of request rate, duration, failures
+- **Logs & Analytics**: Kusto queries for detailed request analysis
+- **Access**: Azure Portal → Application Insights → `week1-api-insights`
+
+**Key Metrics Tracked:**
+- Request count, duration, success/failure rates
+- Authentication events (login, signup, logout, refresh, failed attempts)
+- Exception tracking with context
+- Server health (CPU, memory, uptime)
+
+### Product Metrics - Google Analytics 4
+
+- **Frontend Integration**: Page view tracking, custom events (authentication flows)
+- **Real-time Reports**: User activity, page views, events
+- **Access**: Google Analytics 4 → Reports → Realtime
+
+**Key Metrics Tracked:**
+- Page views (automatic route tracking)
+- Authentication events (login, signup, logout)
+- User sessions and engagement
+
+See [Backend README - Monitoring](./backend/README.md#monitoring--observability) and [Frontend README - Analytics](./frontend/README.md#analytics--product-metrics) for detailed setup and usage.
+
+---
+
 ## 📚 Documentation
 
-- **[Backend README](./backend/README.md)** - Backend API, authentication flow, deployment
-- **[Frontend README](./frontend/README.md)** - Frontend setup, authentication, deployment
+- **[Backend README](./backend/README.md)** - Backend API, authentication flow, deployment, monitoring
+- **[Frontend README](./frontend/README.md)** - Frontend setup, authentication, deployment, analytics
 
 
-MindX Engineer Onboarding - Week 1
+MindX Engineer Onboarding - Week 1 & Week 2

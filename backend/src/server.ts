@@ -9,17 +9,22 @@ import cookieParser from "cookie-parser";
 import { protectedRouter } from "./middlewares/authMiddleware";
 import { corsMiddleware } from "./middlewares/cors";
 import { errorHandler } from "./middlewares/error";
+import { appInsightsRequestTracking } from "./middlewares/appInsightsTracking";
 
 
 dotenv.config();
+initializeAppInsights();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
 app.use(corsMiddleware);
-
 app.use(express.json());
 app.use(cookieParser());
+
+// Track all HTTP requests for Application Insights
+// MUST be after express.json() to avoid conflicts
+app.use(appInsightsRequestTracking);
 
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -41,9 +46,13 @@ app.use(protectedRouter);
 app.use("/user", userRoute);
 app.use(errorHandler);
 
+app.get("/health/error", (_req, res) => {
+  res.status(500).json({ message: "Intentional test error" });
+});
+
+
 const startServer = async () => {
   try {
-    initializeAppInsights();
     
     await connectDB();
     

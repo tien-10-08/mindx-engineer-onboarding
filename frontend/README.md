@@ -185,10 +185,64 @@ frontend/
 
 ---
 
+---
+
+## 📊 Analytics & Product Metrics (Week 2)
+
+### Google Analytics 4
+
+The frontend is integrated with **Google Analytics 4** for product metrics and user behavior tracking.
+
+#### Features
+
+- **Page View Tracking**: Automatic tracking of all route changes (Login, Signup, Home, Profile, etc.)
+- **Custom Events**: Authentication events (login, signup, logout, failed attempts) tracked with user context
+- **Real-time Reports**: Live user activity, page views, and events
+- **User Engagement**: Session tracking, user flow analysis
+
+#### Setup
+
+1. **Get Measurement ID**: Google Analytics 4 → Admin → Data Streams → Web → Measurement ID
+2. **Add to `.env` file**:
+   ```bash
+   VITE_GA_MEASUREMENT_ID
+   ```
+3. **Rebuild and Deploy**:
+   ```bash
+   npm run build
+   npm run deploy
+   ```
+
+#### Access Analytics
+
+- **Real-time**: Google Analytics 4 → Reports → Realtime
+- **Events**: Google Analytics 4 → Reports → Engagement → Events
+- **User Activity**: Google Analytics 4 → Reports → User → User activity
+
+#### Implementation Details
+
+- **Initialization**: `src/services/analytics.ts` - Singleton pattern, initialized on app startup
+- **Page Tracking**: `src/components/GoogleAnalytics.tsx` - React Router integration for automatic page views
+- **Event Tracking**: Custom events for authentication flows, form submissions, errors
+- **PII Protection**: No personally identifiable information (PII) is sent to GA4
+
+#### Tracked Events
+
+| Event | Category | Action | When Triggered |
+|-------|----------|--------|-----------------|
+| Page View | Page | View | Route change (automatic) |
+| Login | Authentication | login | Successful login |
+| Signup | Authentication | signup | Successful signup |
+| Logout | Authentication | logout | User logout |
+| Login Failed | Authentication | failed | Failed login attempt |
+| Error | Error | error | Frontend error caught |
+
+---
+
 ## 📚 Additional Resources
 
-- **[Backend README](../backend/README.md)** - Backend API documentation
-- **[Root README](../README.md)** - Project overview
+- **[Backend README](../backend/README.md)** - Backend API documentation, monitoring setup
+- **[Root README](../README.md)** - Project overview, monitoring overview
 
 
-MindX Engineer Onboarding - Week 1
+MindX Engineer Onboarding - Week 1 & Week 2

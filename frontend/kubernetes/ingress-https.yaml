@@ -1,3 +1,6 @@
+# Ingress cho Cloudflare Tunnel. Host phải trùng URL tunnel (trycloudflare.com hoặc custom domain).
+# Cập nhật host bên dưới nếu đổi URL tunnel.
+# Khi apply: đảm bảo FRONTEND_URL trong Secret week1-api-secrets trùng URL Cloudflare (CORS).
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -12,10 +15,10 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - 135.171.234.236.nip.io
-    secretName: week1-nip-tls
+    - victor-filed-freebsd-performance.trycloudflare.com
+    secretName: week1-app-tls
   rules:
-  - host: 135.171.234.236.nip.io
+  - host: victor-filed-freebsd-performance.trycloudflare.com
     http:
       paths:  
       - path: /api(/|$)(.*)

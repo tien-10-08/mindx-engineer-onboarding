@@ -171,6 +171,8 @@ kubectl create secret generic week1-api-secrets \
   --from-literal=APPLICATIONINSIGHTS_CONNECTION_STRING='<your-app-insights-connection-string>'
 ```
 
+**FRONTEND_URL:** URL production (ví dụ: `https://victor-filed-freebsd-performance.trycloudflare.com` khi dùng Cloudflare). CORS cho phép thêm `*.trycloudflare.com`.
+
 **Note:** `APPLICATIONINSIGHTS_CONNECTION_STRING` is optional. If not provided, Application Insights will be disabled (graceful degradation).
 
 #### Update Deployment
@@ -219,10 +221,67 @@ Authorization: Bearer <accessToken>
 
 ---
 
+---
+
+## 📊 Monitoring & Observability (Week 2)
+
+### Azure Application Insights
+
+The backend is integrated with **Azure Application Insights** for production metrics and observability.
+
+#### Features
+
+- **HTTP Request Tracking**: All API requests are automatically tracked with duration, status codes, and response times
+- **Custom Events**: Authentication events (login, signup, logout, refresh, failed attempts) are tracked with user context
+- **Exception Tracking**: Errors are automatically captured with stack traces and request context
+- **Performance Metrics**: Request duration, server health (CPU, memory), and dependency tracking
+- **Live Metrics**: Real-time monitoring dashboard for immediate insights
+
+#### Setup
+
+1. **Get Connection String**: Azure Portal → Application Insights → `week1-api-insights` → Overview → Connection string
+2. **Add to K8s Secret**:
+   ```bash
+   kubectl patch secret week1-api-secrets --type=merge -p '{"data":{"APPLICATIONINSIGHTS_CONNECTION_STRING":"<base64-encoded-connection-string>"}}'
+   ```
+3. **Restart Deployment**:
+   ```bash
+   kubectl rollout restart deployment/week1-api
+   ```
+
+#### Access Metrics
+
+- **Live Metrics**: Azure Portal → Application Insights → Live Metrics
+- **Performance**: Azure Portal → Application Insights → Performance → Operations
+- **Logs**: Azure Portal → Application Insights → Logs → Kusto queries
+  ```kusto
+  requests | where timestamp > ago(1h) | order by timestamp desc
+  customEvents | where name == "Authentication" | where timestamp > ago(1h)
+  exceptions | where timestamp > ago(1h) | order by timestamp desc
+  ```
+
+#### Implementation Details
+
+- **Middleware**: `src/middlewares/appInsightsTracking.ts` - Manual request tracking for reliability
+- **Initialization**: `src/libs/appInsights.ts` - Singleton pattern, graceful degradation if connection string missing
+- **Configuration**: Auto-collection disabled, manual tracking enabled for better control
+- **Sampling**: 100% (all requests tracked) - adjust in production based on volume
+
+#### Graceful Degradation
+
+If `APPLICATIONINSIGHTS_CONNECTION_STRING` is not set, Application Insights is disabled and the application continues to function normally. Check logs for initialization status:
+
+```bash
+kubectl logs -l app=week1-api | grep "Application Insights"
+```
+
+---
+
 ## Notes
 
 - Azure Kubernetes Service (AKS) is used for public hosting.
 - AKS deployment uses ClusterIP service for internal communication and future ingress routing.
+- Production metrics are available via Azure Application Insights (Week 2).
 
 
-MindX Engineer Onboarding – Week 1
+MindX Engineer Onboarding – Week 1 & Week 2

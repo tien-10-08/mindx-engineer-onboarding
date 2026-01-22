@@ -1,4 +1,4 @@
-import appInsights from "applicationinsights";
+import * as appInsights from "applicationinsights";
 
 let client: appInsights.TelemetryClient | null = null;
 let isInitialized = false;
@@ -41,16 +41,24 @@ export const initializeAppInsights = (): appInsights.TelemetryClient | null => {
   try {
     appInsights
       .setup(connectionString)
-      .setAutoCollectRequests(true)
+      .setAutoCollectRequests(false)  // Disable auto-collection, use manual tracking instead
       .setAutoCollectPerformance(true, true)
       .setAutoCollectExceptions(true)
       .setAutoCollectDependencies(true)
       .setAutoCollectConsole(true, true)
       .setSendLiveMetrics(true)
       .setUseDiskRetryCaching(true)
+      .setAutoDependencyCorrelation(true)
       .start();
 
     client = appInsights.defaultClient;
+    
+    if (client?.config) {
+      client.config.samplingPercentage = 100;
+      // Increase batch size and interval to reduce timeout issues
+      client.config.maxBatchSize = 250;
+      client.config.maxBatchIntervalMs = 15000; // 15 seconds
+    }
     
     // Set cloud role for better identification in Azure Portal
     client.context.tags[client.context.keys.cloudRole] = "week1-api-backend";
