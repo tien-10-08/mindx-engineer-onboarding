@@ -34,6 +34,11 @@ app.get('/health', (req, res) => {
   });
 });
 
+app.get("/health/error", (_req, res) => {
+  res.status(500).json({ message: "Intentional test error" });
+});
+
+
 app.get('/', (req, res) => {
   res.json({
     message: 'Hello World!',
@@ -46,9 +51,6 @@ app.use(protectedRouter);
 app.use("/user", userRoute);
 app.use(errorHandler);
 
-app.get("/health/error", (_req, res) => {
-  res.status(500).json({ message: "Intentional test error" });
-});
 
 
 const startServer = async () => {
