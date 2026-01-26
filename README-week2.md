@@ -308,27 +308,238 @@ VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ### Azure Application Insights
 
 #### Live Metrics
-![Live Metrics showing real-time request tracking]
+![Live Metrics showing real-time request tracking](assets/1.1_%20LiveMetrics%20.png)
+
+**Description**: Real-time monitoring dashboard showing:
+- Request rate (requests/second) in real-time
+- Response time chart with average duration
+- Failed requests count
+- Server metrics (CPU, Memory)
+- Sample requests with status codes
+
+**Key Metrics Observed**:
+- Active requests being processed
+- Average response time
+- Success/failure rate
+- Live server health status
 
 #### Performance Dashboard
-![Performance metrics showing request duration and count]
+![Performance metrics showing request duration and count](assets/1.2_PerformanceDashboard.png)
 
-#### Logs Query Results
-![Kusto query results showing recent requests]
+**Description**: Performance overview showing:
+- Operations list with average duration
+- Top slowest operations (endpoints)
+- Request count chart over time
+- Failed requests percentage
+- Performance breakdown by endpoint
 
-#### Alerts History
-![Alert history showing fired alerts]
+**Key Metrics Observed**:
+- Average request duration per endpoint
+- Request volume trends
+- Failure rates by operation
+- Performance bottlenecks identification
+
+#### Recent Requests (Logs Query)
+![Kusto query results showing recent requests](assets/1.3_RecentRequests.png)
+
+**Query Used**:
+```kusto
+requests 
+| where timestamp > ago(1h) 
+| order by timestamp desc
+| project timestamp, name, url, resultCode, duration, success
+```
+
+**Description**: Logs query results showing:
+- Recent API requests with timestamps
+- Endpoint names and URLs
+- HTTP status codes (200, 400, 500)
+- Request duration in milliseconds
+- Success/failure status
+
+**Key Observations**:
+- Request patterns and frequency
+- Response times for different endpoints
+- Error rates and status codes
+- Request distribution over time
+
+#### Authentication Events (Custom Events)
+![Authentication events tracked in Application Insights](assets/1.4_AuthenticationEvents.png)
+
+**Query Used**:
+```kusto
+customEvents 
+| where name == "Authentication" 
+| where timestamp > ago(1h)
+| project timestamp, name, customDimensions.action, customDimensions.userId
+```
+
+**Description**: Custom events tracking authentication flows:
+- Login events
+- Signup events
+- Logout events
+- Refresh token events
+- Failed authentication attempts
+
+**Key Observations**:
+- Authentication action types
+- User activity patterns
+- Failed login attempts
+- Token refresh frequency
+
+#### Exceptions Tracking
+![Exceptions captured in Application Insights](assets/1.5_Exceptions.png)
+
+**Query Used**:
+```kusto
+exceptions 
+| where timestamp > ago(1h) 
+| order by timestamp desc
+| project timestamp, type, message, outerMessage
+```
+
+**Description**: Exception tracking showing:
+- Exception types and messages
+- Stack traces and error details
+- Request context for exceptions
+- Exception frequency and patterns
+
+**Key Observations**:
+- Error types occurring in production
+- Exception patterns and trends
+- Error context and debugging information
+
+### Azure Alerts
+
+#### Alert Rules List
+![Alert rules configured in Azure Application Insights](assets/2.1_AlertRulesList.png)
+
+**Description**: List of all configured alert rules:
+1. **Exception Rate Critical** - Monitors exception rate exceeding 5%
+2. **Failed Requests Alert** - Detects failed requests (status >= 400)
+3. **Server Unavailable Alert** - Monitors server health check failures
+4. **High Response Time Warning** - Alerts on slow response times
+5. **Elevated Exceptions Warning** - Monitors exception count elevation
+
+**Key Information**:
+- Alert rule names and descriptions
+- Severity levels (Critical/Warning)
+- Enabled/Disabled status
+- Alert evaluation frequency
+
+#### Alert History
+![Alert history showing fired and resolved alerts](assets/2.2_AlertHistory.png)
+
+**Description**: Alert history dashboard showing:
+- Fired alerts with timestamps
+- Alert severity and status
+- Resolved alerts
+- Alert conditions that triggered
+- Notification status
+
+**Key Observations**:
+- Alert firing frequency
+- Alert resolution time
+- Most common alert types
+- Alert reliability and accuracy
 
 ### Google Analytics 4
 
-#### Real-time Report
-![Real-time report showing active users]
+#### Real-time Report - Overview
+![Real-time report showing active users and page views](assets/3.1_RealtimeReport_Overview.png)
 
-#### Events Report
-![Events report showing authentication events]
+**Description**: Real-time monitoring dashboard showing:
+- Active users right now
+- Page views in last 30 minutes
+- Top pages being viewed
+- Top events happening in real-time
+- User locations (if available)
 
-#### User Activity
-![User activity showing page views and sessions]
+**Key Metrics Observed**:
+- Current active user count
+- Real-time page view rate
+- Most popular pages
+- Live event tracking
+
+#### Real-time Report - Events
+![Real-time events being tracked](assets/3.2_RealTimeReport_Events.png)
+
+**Description**: Real-time events dashboard showing:
+- Events happening right now
+- Event count in last 30 minutes
+- Event types: page_view, login, signup, logout, login_failed
+- Event parameters and values
+
+**Key Observations**:
+- Live event tracking
+- Authentication events in real-time
+- Event frequency and patterns
+- User interaction patterns
+
+#### Events Report - Overview
+![Events report showing all tracked events](assets/3.3_EventsReport_Overview.png)
+
+**Description**: Comprehensive events report showing:
+- All tracked events with counts
+- Total users per event
+- Event count per user
+- Event value and engagement metrics
+- Top events by frequency
+
+**Key Metrics**:
+- Total event count
+- Unique users per event
+- Average events per user
+- Event engagement rate
+
+#### Events Report - Event Details
+![Detailed event information](assets/3.4_EventsReport_Even.png)
+
+**Description**: Detailed event breakdown showing:
+- Event parameters (category, action)
+- Event count over time (chart)
+- User breakdown by event
+- Event value and conversion data
+- Event path analysis
+
+**Key Observations**:
+- Event trends over time
+- User engagement with events
+- Event conversion rates
+- Event correlation patterns
+
+#### Events Report - Pages and Screens
+![Page views and screen tracking](assets/3.5_EventsReport_PageAndScreen.png)
+
+**Description**: Pages and screens report showing:
+- Top pages by page views
+- Average time on page
+- Page views per session
+- Page engagement metrics
+- User flow through pages
+
+**Key Metrics**:
+- Page view counts
+- Most visited pages (/login, /signup, /)
+- Session duration per page
+- Bounce rate and engagement
+
+#### Events Report - Authentication Events Detail
+![Detailed authentication events tracking](assets/3.6_EventsReport%20_AuthenticationEventsDetail.png)
+
+**Description**: Detailed authentication events analysis showing:
+- Login events breakdown
+- Signup events breakdown
+- Logout events
+- Failed login attempts
+- Authentication success rate
+- User authentication patterns
+
+**Key Observations**:
+- Authentication event frequency
+- Success vs failure rates
+- User authentication behavior
+- Security insights from failed attempts
 
 ---
 
