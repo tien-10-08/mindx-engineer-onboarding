@@ -4,6 +4,7 @@ import User from "../models/User";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import Session from "../models/Session";
+import { trackAuthEvent } from "../libs/appInsights";
 
 const accessTokenExpiry = "30m"; // Thời gian hết hạn của access token
 const refreshTokenExpiry = 14 * 24 * 60 * 60 * 1000; // Thời gian hết hạn của refresh token
@@ -23,12 +24,15 @@ export const signup = async (req: Request, res: Response) => {
         .json({ message: "Username or email already exists" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({
+    const newUser = await User.create({
       username,
       hashedPassword,
       email,
       displayName: `${firstName} ${lastName}`,
     });
+    
+    trackAuthEvent("signup", newUser._id.toString());
+    
     return res.sendStatus(204);
   } catch (error) {
     console.error("Signup error:", error);
@@ -47,6 +51,7 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await User.findOne({ username });
     if (!user) {
+      trackAuthEvent("failed", username);
       return res
         .status(401)
         .json({ message: "Username or password is incorrect" });
@@ -54,6 +59,7 @@ export const login = async (req: Request, res: Response) => {
 
     const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
     if (!passwordMatch) {
+      trackAuthEvent("failed", user._id.toString());
       return res
         .status(401)
         .json({ message: "Username or password is incorrect" });
@@ -83,6 +89,8 @@ export const login = async (req: Request, res: Response) => {
       sameSite: "none",
       maxAge: refreshTokenExpiry,
     });
+
+    trackAuthEvent("login", user._id.toString());
 
     return res.status(200).json({ message: "Login successful", accessToken });
   } catch (error) {
@@ -130,6 +138,8 @@ export const refresh = async (req: Request, res: Response) => {
       { expiresIn: accessTokenExpiry }
     );
 
+    trackAuthEvent("refresh", user._id.toString());
+
     return res.status(200).json({
       message: "Token refreshed successfully",
       accessToken,
@@ -145,8 +155,15 @@ export const logout = async (req: Request, res: Response) => {
     //lấy refresh token từ cookie
     const token = req.cookies.refreshToken;
     if (token) {
+      const session = await Session.findOne({ refreshToken: token });
+      
       // xóa refresh token khỏi Session
       await Session.deleteOne({ refreshToken: token });
+      
+      if (session) {
+        trackAuthEvent("logout", session.userId.toString());
+      }
+      
       //xóa cookie
       res.clearCookie("refreshToken");
     }

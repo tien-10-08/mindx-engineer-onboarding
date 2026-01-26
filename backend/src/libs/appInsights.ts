@@ -55,9 +55,9 @@ export const initializeAppInsights = (): appInsights.TelemetryClient | null => {
     
     if (client?.config) {
       client.config.samplingPercentage = 100;
-      // Increase batch size and interval to reduce timeout issues
+      // Reduce batch interval for faster data transmission (5 seconds)
       client.config.maxBatchSize = 250;
-      client.config.maxBatchIntervalMs = 15000; // 15 seconds
+      client.config.maxBatchIntervalMs = 5000; // 5 seconds for faster visibility
     }
     
     // Set cloud role for better identification in Azure Portal
@@ -83,13 +83,22 @@ export const trackEvent = (
   name: string, 
   properties?: Record<string, string>
 ): void => {
-  if (!client) return;
+  if (!client) {
+    if (process.env.NODE_ENV === "production") {
+      console.warn(`[AppInsights] Client not initialized, skipping event: ${name}`);
+    }
+    return;
+  }
   
   try {
     client.trackEvent({ name, properties });
+    
+    // Debug logging in production
+    if (process.env.NODE_ENV === "production") {
+      console.log(`[AppInsights] Event tracked: ${name}`, properties);
+    }
   } catch (error) {
-    // Silently fail - don't break application flow
-    console.error("Failed to track event:", error);
+    console.error("[AppInsights] Failed to track event:", error);
   }
 };
 
@@ -197,10 +206,29 @@ export const trackAuthEvent = (
   eventType: "login" | "logout" | "signup" | "refresh" | "failed",
   userId?: string
 ): void => {
-  trackEvent("Authentication", {
+  const properties = {
     eventType,
     userId: userId || "unknown",
     timestamp: new Date().toISOString(),
-  });
+  };
+  
+  // Debug logging in production
+  if (process.env.NODE_ENV === "production") {
+    console.log(`[AppInsights] Tracking auth event: ${eventType}, userId: ${userId || "unknown"}`);
+  }
+  
+  trackEvent("Authentication", properties);
+  
+  // Flush immediately for critical auth events to ensure they're sent quickly
+  if (client) {
+    try {
+      client.flush();
+    } catch (error) {
+      // Ignore flush errors, data will be sent in next batch
+      if (process.env.NODE_ENV === "production") {
+        console.warn("[AppInsights] Flush failed (non-critical):", error);
+      }
+    }
+  }
 };
 
